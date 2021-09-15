@@ -1,0 +1,98 @@
+//UC1
+
+ create database addressBookService;
+ show databases;
+ use addressBookService;
+
+
+//UC2
+
+
+create table address_book
+    -> (
+    -> id Int unsigned NOT NULL AUTO_INCREMENT,
+    -> firstname VARCHAR(30) NOT NULL,
+    -> lastname VARCHAR(30) NOT NULL,
+    -> address VARCHAR(150) NOT NULL,
+    -> city VARCHAR(20) NOT NULL,
+    -> state VARCHAR(20) NOT NULL,
+    -> zipcode Int NOT NULL,
+    -> phonenumber BIGINT NOT NULL,
+    -> email VARCHAR(30) NOT NULL,
+    -> PRIMARY KEY (id)
+    -> );
+
+Describe address_book;
+
+
+//UC3
+
+
+insert into address_book(firstname,lastname,address,city,state,zipcode,phonenumber,email) values
+    -> ('Raaj','Shetye','Mulund','Mumbai','Maha',1234,982454,'rajs@gmail.com'),
+    -> ('Raj','Shetye','Mulund','Mumbai','Maha',7896,154811,'raj@gmail.com'),
+    -> ('ABC','S','Mul','Mum','Mah',4008,982454,'abc@gmail.com'),
+    -> ('Virat','Kohli','Xyz','ad','Delhi',401818,7181818,'vk18@gmail.com'),
+    -> ('CAD','Ddan','jdgar','Thane','Maharashtra',40351,25887,'haaba@gmail.com');
+
+select * from address_book;
+
+
+//UC4
+
+
+update address_book set address = 'Mulund East' where firstname = 'Raj' and lastname = 'Shetye';
+update address_book set phonenumber = '696969' where firstname = 'Virat' and lastname = 'Kohli';
+select * from address_book;
+
+//UC5
+
+
+delete from address_book where firstname = 'CAD';
+
+
+//UC6
+
+
+select * from address_book where city='Mumbai' or state='Mah';
+
+
+//UC7
+
+
+select count(city) from address_book;
+select count(state) from address_book;
+
+
+
+//UC8
+
+
+select * from address_book where city='Mumbai' order by firstname; 
+
+
+//UC9
+
+
+alter table address_book add type Varchar(20) NOT NULL;
+select * from address_book;
+update address_book set type = 'Family' where firstname = 'Virat';
+update address_book set type = 'Friend' where firstname In('ABC','Raaj');
+update address_book set type = 'Family' where firstname = 'Raj';
+select * from address_book;
+
+
+//UC10
+
+
+select type,count(*) from address_book where type = 'Friend';
+select type,count(*) from address_book where type = 'Family';
+
+
+//UC11
+
+
+insert into address_book(firstname,lastname,address,city,state,zipcode,phonenumber,email,type) values
+    -> ('Rohit','Sharma','Bandra','Mumbai','Mah',40001,123456889,'rs45@gmail.com','Family'),
+    -> ('kkc','sfm','afkna','fakf','afjnaw',4819,97545,'Fma@gmail.com','Friend');
+select * from address_book;

@@ -96,3 +96,78 @@ insert into address_book(firstname,lastname,address,city,state,zipcode,phonenumb
     -> ('Rohit','Sharma','Bandra','Mumbai','Mah',40001,123456889,'rs45@gmail.com','Family'),
     -> ('kkc','sfm','afkna','fakf','afjnaw',4819,97545,'Fma@gmail.com','Friend');
 select * from address_book;
+
+
+
+//UC12
+
+
+alter table address_book
+    -> drop column address,
+    -> drop column city,
+    -> drop column state,
+    -> drop column zip,
+    -> drop column type;
+alter table address_book rename to person;
+alter table person rename column id to person_id;
+
+create table address
+    -> (
+    -> person_id int unsigned not null,
+    -> perm_address varchar(100) not null,
+    -> city varchar(30) not null,
+    -> state varchar(30) not null,
+    -> zip int not null,
+    -> primary key(person_id),
+    -> foreign key(person_id) references person(person_id)
+    -> );
+
+create table address_type
+    -> (
+    -> id int unsigned not null,
+    -> type varchar(30) not null,
+    -> primary key(id)
+    -> );
+
+
+insert into address_type(id,type) values
+    -> (1,'Family'),
+    -> (2,'Friend'),
+    -> (3,'Xyz');
+
+ insert into address(address_id,city,state,zip,person_id) values(1,'Mum','mah',40081,1);
+ insert into address(address_id,city,state,zip,person_id) values(2,'kalyan','mah',4041,3);
+ insert into address(address_id,city,state,zip,person_id) values(3,'thane','mah',4012,2);
+ insert into address(address_id,city,state,zip,person_id) values(4,'thane','mah',4012,4);
+ insert into address(address_id,city,state,zip,person_id) values(5,'Mumbai','mah',4011,6);
+Query OK, 1 row affected (0.16 sec)
+
+mysql> insert into address(address_id,city,state,zip,person_id) values(6,'Mumbai','maha',4011,7);
+ 
+    
+
+select person.firstname, person.lastname, address.city from person inner join address on address.person_id = person.person_id where state = 'mah';
++-----------+----------+--------+
+| firstname | lastname | city   |
++-----------+----------+--------+
+| Raaj      | Shetye   | Mum    |
+| ABC       | S        | kalyan |
+| Raj       | Shetye   | thane  |
+| Virat     | Kohli    | thane  |
+| Rohit     | Sharma   | Mumbai |
++-----------+----------+--------+
+5 rows in set (0.04 sec)
+
+
+ select * from person order by firstname;
++-----------+-----------+----------+-------------+----------------+
+| person_id | firstname | lastname | phonenumber | email          |
++-----------+-----------+----------+-------------+----------------+
+|         3 | ABC       | S        |      982454 | abc@gmail.com  |
+|         7 | kkc       | sfm      |       97545 | Fma@gmail.com  |
+|         1 | Raaj      | Shetye   |      982454 | rajs@gmail.com |
+|         2 | Raj       | Shetye   |      154811 | raj@gmail.com  |
+|         6 | Rohit     | Sharma   |   123456889 | rs45@gmail.com |
+|         4 | Virat     | Kohli    |      696969 | vk18@gmail.com |
+
+

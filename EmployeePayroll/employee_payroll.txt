@@ -46,3 +46,158 @@ select gender,avg(salary) from employee_payroll group by gender;
 select gender,min(salary) from employee_payroll group by gender;
 select gender,max(salary) from employee_payroll group by gender;
 select gender,count(salary) from employee_payroll group by gender;
+
+
+//UC8
+
+alter table employee_payroll add phone_num int(10);
+alter table employee_payroll add address varchar(50);
+alter table employee_payroll add department varchar(50) NOT NULL;
+alter table employee_payroll alter address set default 'TBD';
+select * from employee_payroll;
+
+
+//UC9
+
+alter table employee_payroll RENAME column salary to basic_pay;
+alter table employee_payroll add deductions Double not null after basic_pay;
+alter table employee_payroll add taxable_pay Double not null after deductions;
+alter table employee_payroll add tax Double not null after taxable_pay;
+alter table employee_payroll add net_pay double not null after tax;
+select * from employee_payroll;
+
+
+//UC10
+
+update employee_payroll set name = "TERISSA" where name = "MARK";
+update employee_payroll set department = "Sales" where name = "TERISSA";
+insert into employee_payroll(name,gender,basic_pay,deductions,taxable_pay,tax,net_pay,start,phone_num,address,department) values
+('TERISSA','F',696969,5000.00,500000.00,25000,800000.00,'2019-11-13',12457,'Mumbai','Marketing');
+selct * from employee_payroll;
+
+
+//UC11
+
+alter table employee_payroll drop column department,
+    -> drop column basic_pay,
+    -> drop column taxable_pay,
+    -> drop column net_pay,
+    -> drop column deductions,
+    -> drop column tax,
+    -> drop column address;
+
+alter table employee_payroll rename to employee;
+
+create table department
+    -> (
+    -> dept_id Int not null auto_increment,
+    -> dept_name varchar(30) not null,
+    -> Primary key(dept_id)
+    -> );
+
+create table address
+    -> (
+    -> emp_id int unsigned not null,
+    -> perm_address varchar(100) not null,
+    -> city varchar(30) not null,
+    -> state varchar(30) not null,
+    -> country varchar(30) not null,
+    -> zip int not null,
+    -> primary key (emp_id),
+    -> Foreign key (emp_id) references employee_payroll(emp_id)
+    -> );
+
+
+create table payroll
+    -> (
+    -> emp_id int unsigned not null,
+    -> basic_pay double not null,
+    -> deductions double not null,
+    -> taxable_pay double not null,
+    -> tax double not null,
+    -> net_pay double not null,
+    -> Primary key(emp_id),
+    -> Foreign key(emp_id) references employee_payroll(emp_id)
+    -> );
+
+
+
+create table company
+    -> (
+    -> emp_id int unsigned not null,
+    -> dept_id int not null,
+    -> Primary key(emp_id,dept_id),
+    -> Foreign key(emp_id) references employee(emp_id),
+    -> Foreign key(dept_id) references department(dept_id)
+    -> );
+
+
+insert into department(dept_id,dept_name) values
+    -> (1,'Sales'),
+    -> (2,'Marketing'),
+    -> (3,'Finance'),
+    -> (4,'IT');
+
+
+insert into company (emp_id,dept_id) values
+    -> (1,1),
+    -> (2,4),
+    -> (3,2),
+    -> (4,3);
+
+
+insert into payroll (emp_id,basic_pay,deductions,taxable_pay,tax,net_pay) values
+    -> (1,1234567.00,12345.00,123456.00,142454.00,2424545.00),
+    -> (2,45486565.00,45432.00,5457878.00,3454533.00,5554548.00),
+    -> (3,216845.00,1545.00,5000.00,4878.00,544541.00),
+    -> (4,1234.00,123.00,1000.00,234.00,1500.00);
+
+
+insert into address(emp_id,perm_address,city,state,country,zip) values
+    -> (1,'Mithaghar Road','Mumbai','MH','India',400081),
+    -> (2,'Phadke Road','Dombivili','Maharashtra','India',1234),
+    -> (3,'Xyz','Thane','Maharashtra','India',4088),
+    -> (4,'Abc','Andheri','Maharashtra','India',6969);
+
+
+//UC12
+
+
+
+select e.name,e.phone_num,e.start,e.gender,d.dept_name,a.perm_address,a.city,a.state,a.country,a.zip, p.basic_pay,p.taxable_pay,p.tax,p.net_pay
+    -> from employee e,department d,address a,payroll p,company c
+    -> where c.emp_id = e.emp_id
+    -> and c.dept_id = d.dept_id
+    -> and a.emp_id = e.emp_id
+    -> and p.emp_id = e.emp_id;
+
++---------+-----------+------------+--------+-----------+----------------+-----------+-------------+---------+--------+-----------+-------------+---------+---------+
+| name    | phone_num | start      | gender | dept_name | perm_address   | city      | state       | country | zip    | basic_pay | taxable_pay | tax     | net_pay |
++---------+-----------+------------+--------+-----------+----------------+-----------+-------------+---------+--------+-----------+-------------+---------+---------+
+| BILL    |      NULL | 2018-01-03 | NULL   | Sales     | Mithaghar Road | Mumbai    | MH          | India   | 400081 |   1234567 |      123456 |  142454 | 2424545 |
+| CHARLIE |      NULL | 2020-05-21 | NULL   | Marketing | Xyz            | Thane     | Maharashtra | India   |   4088 |    216845 |        5000 |    4878 |  544541 |
+| TERISSA |     12457 | 2019-11-13 | F      | Finance   | Abc            | Andheri   | Maharashtra | India   |   6969 |      1234 |        1000 |     234 |    1500 |
+| TERISSA |      NULL | 2019-11-13 | F      | It        | Phadke Road    | Dombivili | Maharashtra | India   |   1234 |  45486565 |     5457878 | 3454533 | 5554548 |
++---------+-----------+------------+--------+-----------+----------------+-----------+-------------+---------+--------+-----------+-------------+---------+---------+
+
+
+select e.gender,avg(p.basic_pay),avg(p.taxable_pay),avg(p.tax),avg(p.net_pay)
+    -> from employee e,payroll p
+    -> where e.emp_id = p.emp_id
+    -> group by gender;
+
+
++--------+------------------+--------------------+------------+----------------+
+| gender | avg(p.basic_pay) | avg(p.taxable_pay) | avg(p.tax) | avg(p.net_pay) |
++--------+------------------+--------------------+------------+----------------+
+| NULL   |           725706 |              64228 |      73666 |        1484543 |
+| F      |       22743899.5 |            2729439 |  1727383.5 |        2778024 |
++--------+------------------+--------------------+------------+----------------+
+
+
+
+
+
+
+
+
